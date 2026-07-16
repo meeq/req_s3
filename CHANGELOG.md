@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.2.4
+
+  * Support Req ~> 0.6.
+
 ## v0.2.3
 
   * Use scheme and port from `endpoint_url`.
