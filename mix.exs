@@ -8,9 +8,7 @@ defmodule ReqS3.MixProject do
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      aliases: [
-        "test.all": ["test --include integration"]
-      ],
+      aliases: aliases(),
       docs: [
         main: "readme",
         extras: ["README.md", "CHANGELOG.md", "examples/mnist.livemd", "examples/upload.livemd"]
@@ -39,6 +37,12 @@ defmodule ReqS3.MixProject do
         docs: :docs,
         "hex.publish": :docs
       ]
+    ]
+  end
+
+  defp aliases do
+    [
+      "test.all": ["test --include integration"]
     ]
   end
 
