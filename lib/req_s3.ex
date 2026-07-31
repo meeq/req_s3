@@ -95,6 +95,9 @@ defmodule ReqS3 do
     * `:endpoint_url` - if set, the endpoint URL for S3-compatible services. If
       `AWS_ENDPOINT_URL_S3` system environment variable is set, it is considered first.
 
+    * `:expires` - the number of seconds after which the URL should expire. Defaults to
+      `86400` (1 day).
+
   ## Examples
 
   Note: This example assumes `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables
@@ -140,7 +143,8 @@ defmodule ReqS3 do
     end)
     |> Keyword.update!(:url, &normalize_url(&1, options[:endpoint_url]))
     |> Keyword.put(:service, "s3")
-    |> Keyword.put(:datetime, DateTime.utc_now())
+    |> Keyword.put_new(:datetime, DateTime.utc_now())
+    |> Keyword.put_new(:expires, 86400)
     |> Keyword.drop([:bucket, :key, :endpoint_url])
     |> Req.Utils.aws_sigv4_url()
     |> URI.to_string()
@@ -370,9 +374,18 @@ defmodule ReqS3 do
 
   # TODO: Req.add_request_steps(req, steps, before: step)
   defp add_request_steps_before(request, steps, before_step_name) do
-    request
-    |> Map.update!(:request_steps, &prepend_steps(&1, steps, before_step_name))
-    |> Map.update!(:current_request_steps, &prepend_current_steps(&1, steps, before_step_name))
+    request = Map.update!(request, :request_steps, &prepend_steps(&1, steps, before_step_name))
+
+    # Req 0.7 removed :current_request_steps; keep updating it on older versions.
+    if Map.has_key?(request, :current_request_steps) do
+      Map.update!(
+        request,
+        :current_request_steps,
+        &prepend_current_steps(&1, steps, before_step_name)
+      )
+    else
+      request
+    end
   end
 
   defp prepend_steps([{before_step_name, _} | _] = rest, steps, before_step_name) do

@@ -4,13 +4,11 @@ defmodule ReqS3.MixProject do
   def project do
     [
       app: :req_s3,
-      version: "0.2.3",
+      version: "0.2.4",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      aliases: [
-        "test.all": ["test --include integration"]
-      ],
+      aliases: aliases(),
       docs: [
         main: "readme",
         extras: ["README.md", "CHANGELOG.md", "examples/mnist.livemd", "examples/upload.livemd"]
@@ -42,9 +40,15 @@ defmodule ReqS3.MixProject do
     ]
   end
 
+  defp aliases do
+    [
+      "test.all": ["test --include integration"]
+    ]
+  end
+
   defp deps do
     [
-      {:req, "~> 0.5.6"},
+      {:req, "~> 0.5.6 or ~> 0.6.0 or ~> 0.7.0"},
       {:ex_doc, ">= 0.0.0", only: :docs}
     ]
   end
